@@ -90,7 +90,6 @@ export default function Dropzone() {
   const [isHover, setIsHover] = useState<boolean>(false)
   const [actions, setActions] = useState<Action[]>([])
   const [isReady, setIsReady] = useState<boolean>(false)
-  const [isLoaded, setIsLoaded] = useState<boolean>(false)
   const [isConverting, setIsConverting] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const ffmpegRef = useRef<FFmpeg | null>(null)
@@ -99,7 +98,6 @@ export default function Dropzone() {
   useEffect(() => {
     loadFfmpeg().then((ffmpeg) => {
       ffmpegRef.current = ffmpeg
-      setIsLoaded(true)
     })
   }, [])
 
@@ -161,13 +159,7 @@ export default function Dropzone() {
     for (const action of actions) {
       try {
         if (ffmpegRef.current) {
-          const { url, output } = await convertFile(
-            ffmpegRef.current,
-            action,
-            (progress) => {
-              setProgress((prevProgress) => (prevProgress + progress) / 2)
-            }
-          )
+          const { url, output } = await convertFile(ffmpegRef.current, action)
           setActions((prevActions) =>
             prevActions.map((a) =>
               a === action
